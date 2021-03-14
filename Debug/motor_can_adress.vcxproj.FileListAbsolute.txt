@@ -1,0 +1,2 @@
+C:\Users\danil\source\repos\motor_can_adress\Debug\motor_can_adress.exe
+C:\Users\danil\source\repos\motor_can_adress\Debug\motor_can_adress.pdb
