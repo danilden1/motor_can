@@ -68,6 +68,11 @@ typedef struct {
     uint32_t timer_pos; //позиция первого бита в таймере. предполагается, что таймеры 4х битные.
     std::string comment;
 }adress_t;
+
+typedef struct {
+    uint8_t byte;
+    uint8_t bit;
+}pair_bits_t;
 //массив для применения в процедурах выставления одного бита. Нулевой бит самый правый.
 uint8_t bits_arr[8] = {
     0b00000001,
@@ -149,6 +154,8 @@ int setByte(std::vector<adress_t>& a, uint32_t adr, uint32_t byte_pos, uint32_t 
     std::cout << "!!!error set bit on adr " << adr;
     return 1;
 }
+
+
 
 int setBit(std::vector<adress_t>& a, uint32_t adr, uint32_t bit_pos, uint32_t byte_pos) {
 
@@ -315,10 +322,18 @@ void printAllData(std::vector<adress_t> a) {
     }
 }
 
+//переводит значение бит в пару из значений байт(0-7) и бит(0-7)
+pair_bits_t  bitToByte(const uint32_t input_bit) {
+    pair_bits_t ret;
+    ret.byte = input_bit / 8;
+    ret.bit = input_bit % 8;
+    return ret;
+}
 
 int main()
 {
     //test comment
+    //test comment 2
     setlocale(LC_ALL, "Russian");
     
     adress_t my; // вектор всех адресов
@@ -453,10 +468,17 @@ int main()
     soh /= 0.5;
     setByte(m, 0x18FFA1F3, BYTE_3, (uint32_t)(soh));
 
+
+
+    //биты 32-47 байты 
+    //сопративление батареи
+    float battary_resistance = 0.005; //сопративление батареи 5 мОм
+    battary_resistance /= 0.001;
+    setTwoByte(m, 0x18FFA1F3, bitToByte(33).byte, (uint32_t)(battary_resistance));
+
+
     printMessageBin(m, 0x18FFA1F3);
     printMessageHex(m, 0x18FFA1F3);
-
-
     printAllData(m);
 
 
