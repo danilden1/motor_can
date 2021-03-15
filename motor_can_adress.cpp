@@ -7,6 +7,11 @@
 #include <bitset>
 #include <iomanip>
 
+//TODO: проверить функции установки двух байт. можкт быть не везде нужно байти вестами менять
+//TODO: написать генератор массивов для вставки его в проект Дмитрия для STM
+//TODO: написать сортировщик для распределения адрисов по циклу отправки
+//TODO: написать сортировщик для распределения адрисов по циклу увиличения таймера
+
 #define ad0x18FFA0F3 0
 #define ad0x18FFA1F3 1
 #define ad0x18FFA2F3 2
@@ -66,7 +71,7 @@ typedef struct {
     uint32_t cycle; // время повторения посылки
     uint32_t time_cycle; // время обновления таймера, если 0, то аймера нет
     uint32_t timer_pos; //позиция первого бита в таймере. предполагается, что таймеры 4х битные.
-    std::string comment;
+    std::string comment; //содержание сообщения
 }adress_t;
 
 typedef struct {
@@ -101,8 +106,15 @@ int printAdress(std::vector<adress_t> a, uint32_t adr) {
     }
     return 0;
 }
-
-int printMessageBin(std::vector<adress_t> a, uint32_t adr) {
+/**
+ * @brief Печатает сообщение в бинарном виде.
+ * @param a ссылка на вектор со всеми адресами
+ * @param adr адрес интересующего нас сообщения
+ * @return возвращает 0 при выполнении функции, при ошибках 1.
+ */
+int printMessageBin(
+    const std::vector<adress_t> a, 
+    const uint32_t adr) {
     for (int i = 0; i < a.size(); i++) {
         if (a[i].adress == adr) {
             std::cout << "adr 0x" << std::hex << adr << ": ";
@@ -117,7 +129,16 @@ int printMessageBin(std::vector<adress_t> a, uint32_t adr) {
     return 0;
 }
 
-int printMessageHex(std::vector<adress_t> a, uint32_t adr) {
+/**
+ * @brief Печатает сообщение в шестнадцетеричном виде.
+ * @param a ссылка на вектор со всеми адресами
+ * @param adr адрес интересующего нас сообщения
+ * @return возвращает 0 при выполнении функции, при ошибках 1.
+ */
+int printMessageHex(
+    const std::vector<adress_t> a, 
+    const uint32_t adr) {
+
     for (int i = 0; i < a.size(); i++) {
         if (a[i].adress == adr) {
             std::cout << "adr 0x" << std::hex << adr << ": ";
@@ -131,8 +152,17 @@ int printMessageHex(std::vector<adress_t> a, uint32_t adr) {
     std::cout << "!!! error to print message in hex by adr = 0x" << std::hex << adr << std::endl;
     return 0;
 }
-
-int setMessage(std::vector<adress_t> &a, uint32_t adr, uint32_t mes[8]) {
+/**
+ * @brief Устанавливает все 8 байт в сообщение.
+ * @param a ссылка на вектор со всеми адресами
+ * @param adr адрес интересующего нас сообщения
+ * @param mes[8] массив со всеми значениями сообщений
+ * @return возвращает 0 при выполнении функции, при ошибках 1.
+ */
+int setMessage(
+    std::vector<adress_t> &a, 
+    uint32_t adr, 
+    uint32_t mes[8]) {
 
     for (int i = 0; i < a.size(); i++) {
         if (a[i].adress == adr) {
@@ -146,7 +176,14 @@ int setMessage(std::vector<adress_t> &a, uint32_t adr, uint32_t mes[8]) {
     return 1;
 }
 
-//устанавливает один байт
+/**
+ * @brief Устанавливает байт в сообщение.
+ * @param a ссылка на вектор со всеми адресами
+ * @param adr адрес интересующего нас сообщения
+ * @param byte_pos позиция устанавливаемого байта в сообщение (0-7)
+ * @param byte_value значение устанавливаемого байта
+ * @return возвращает 0 при выполнении функции, при ошибках 1.
+ */
 int setByte(
     std::vector<adress_t>& a, 
     const uint32_t adr, 
@@ -163,7 +200,23 @@ int setByte(
     return 1;
 }
 
-int set12Bits(std::vector<adress_t>& a, uint32_t adr, uint32_t bit_pos, uint32_t byte_value) {
+/**
+ * @brief Устанавливает подряд 12 бит. может приметяться только 
+ * с последуюшей установкой еще 4х бит в старшие разряды второго байта
+ * @param a ссылка на вектор со всеми адресами
+ * @param adr адрес интересующего нас сообщения
+ * @param bit_pos позиция младшего бита для установки. Предполагается, что данный
+ * параметр всегда кратен 8.
+ * @param byte_value значение устанавливаемого значенния
+ * @return возвращает 0 при выполнении функции, при ошибках 1.
+ */
+
+int set12Bits(
+    std::vector<adress_t>& a, 
+    const uint32_t adr, 
+    const uint32_t bit_pos, 
+    const uint32_t byte_value) {
+
     if (bit_pos > 50 || byte_value > 0xFFF) {
         std::cout << "!!!error set12Bits on adr " << adr;
         return 1;
@@ -182,8 +235,18 @@ int set12Bits(std::vector<adress_t>& a, uint32_t adr, uint32_t bit_pos, uint32_t
 
 }
 
+/**
+ * @brief Устанавливает бит в сообщении
+ * @param a ссылка на вектор со всеми адресами
+ * @param adr адрес интересующего нас сообщения
+ * @param bit_pos позиция младшего бита для установки. Предполагается, что данный
+ * параметр всегда кратен 8.
+ * @param byte_value значение устанавливаемого значенния
+ * @return возвращает 0 при выполнении функции, при ошибках 1.
+ */
 
-int setBit(std::vector<adress_t>& a, uint32_t adr, uint32_t bit_pos, uint32_t byte_pos) {
+int setBit(
+    std::vector<adress_t>& a, uint32_t adr, uint32_t bit_pos, uint32_t byte_pos) {
 
     for (int i = 0; i < a.size(); i++) {
         if (a[i].adress == adr) {
@@ -195,7 +258,19 @@ int setBit(std::vector<adress_t>& a, uint32_t adr, uint32_t bit_pos, uint32_t by
     return 1;
 }
 
-int setLower4Bites(std::vector<adress_t>& a, uint32_t adr,  uint32_t byte_pos, uint8_t bits_value) {
+/**
+ * @brief Устанавливает младшие 4 бита в указанный байт
+ * @param a ссылка на вектор со всеми адресами
+ * @param adr адрес интересующего нас сообщения
+ * @param byte_pos байта для установки (0-7).
+ * @param bits_value значение устанавливаемого значенния
+ * @return возвращает 0 при выполнении функции, при ошибках 1.
+ */
+int setLower4Bites(
+    std::vector<adress_t>& a, 
+    const uint32_t adr,  
+    const uint32_t byte_pos, 
+    const uint8_t bits_value) {
 
     for (int i = 0; i < a.size(); i++) {
         if (a[i].adress == adr) {
@@ -207,7 +282,19 @@ int setLower4Bites(std::vector<adress_t>& a, uint32_t adr,  uint32_t byte_pos, u
     return 1;
 }
 
-int setUpper4Bites(std::vector<adress_t>& a, uint32_t adr, uint32_t byte_pos, uint8_t bits_value) {
+/**
+ * @brief Устанавливает старшие 4 бита в указанный байт
+ * @param a ссылка на вектор со всеми адресами
+ * @param adr адрес интересующего нас сообщения
+ * @param byte_pos байта для установки (0-7).
+ * @param bits_value значение устанавливаемого значенния
+ * @return возвращает 0 при выполнении функции, при ошибках 1.
+ */
+int setUpper4Bites(
+    std::vector<adress_t>& a, 
+    const uint32_t adr, 
+    const uint32_t byte_pos, 
+    const uint8_t bits_value) {
 
     for (int i = 0; i < a.size(); i++) {
         if (a[i].adress == adr) {
@@ -218,10 +305,25 @@ int setUpper4Bites(std::vector<adress_t>& a, uint32_t adr, uint32_t byte_pos, ui
     std::cout << "!!!error setUpper4Bites on adr " << adr;
     return 1;
 }
-// 
-int set2Bites(std::vector<adress_t>& a, uint32_t adr, uint32_t bite_pos, uint8_t bits_value) {
+
+
+/**
+ * @brief Устанавливает старшие 2 бита подряд начиная с указанного бита
+ * нужно для быстрого выполнения двухбитны команд
+ * @param a ссылка на вектор со всеми адресами
+ * @param adr адрес интересующего нас сообщения
+ * @param bite_pos начиная с какого бита следует установить (0 - 61).
+ * @param bits_value значение устанавливаемого значенния
+ * @return возвращает 0 при выполнении функции, при ошибках 1.
+ */
+int set2Bites(
+    std::vector<adress_t>& a, 
+    const uint32_t adr, 
+    const uint32_t bite_pos, 
+    const uint8_t bits_value) {
+
     if (bits_value > 3 || bits_value > 62){
-        std::cout << "!!!error setUpper4Bites by input data on adr " << adr << std::endl;
+        std::cout << "!!!error set2Bites by input data on adr " << adr << std::endl;
     }
     uint32_t byte_pos = bite_pos / 8;
     uint32_t bit_start = bite_pos % 8;
@@ -248,32 +350,83 @@ int set2Bites(std::vector<adress_t>& a, uint32_t adr, uint32_t bite_pos, uint8_t
             return 0;
         }
     }
-    std::cout << "!!!error setUpper4Bites on adr " << adr;
+    std::cout << "!!!error set2Bites on adr " << adr;
     return 1;
 }
 
 
-//меняет старший и младший байты местами. нужно для 16 битных посылок
-std::pair<uint32_t, uint32_t>  swapByte(const uint32_t input) {
+/**
+ * @brief Меняет старший и младший бит в в 16 битной переменной местами
+ * нужно для 16 битных посылок
+ * @param input значение для 16 битной посылки
+ * @return пара перевернутых значений младший байт, старший байт
+ */
+
+std::pair<uint8_t, uint8_t>  swapByte(const uint16_t input) {
     uint32_t high_value = 0;
     uint32_t low_value = 0;
-    std::pair<uint32_t, uint32_t> ret;
+    std::pair<uint8_t, uint8_t> ret;
     high_value = input >> 8;//сдвигаем на 8 байт вправо и тем самым получаем старший байт
     low_value = input;
     low_value &= ~(0xff00);//отризаем старший байт и тем самым получаем младший байт
-    ret.first = (low_value);
-    ret.second =  (high_value);
+    ret.first = (uint8_t)(low_value);
+    ret.second =  (uint8_t)(high_value);
     return ret;
 
 }
-
-//устанавливает 2 байта в подряд идушье ячейки сообщения. нужно для 16 битных сообщений
-int setTwoByte(std::vector<adress_t>& a, uint32_t adr, uint32_t byte_pos, uint32_t byte_value) {
+/**
+ * @brief устанавливает 2 байта переворачивая в подряд идущие ячейки сообщения. 
+ * нужно для 16 битных сообщений
+ * @param a ссылка на вектор со всеми адресами
+ * @param adr адрес интересующего нас сообщения
+ * @param byte_pos начиная с какого байта следует установить (0 - 6).
+ * @param byte_value значение устанавливаемого значенния
+ * @return возвращает 0 при выполнении функции, при ошибках 1.
+ */
+int setTwoByte(
+    std::vector<adress_t>& a,
+    const uint32_t adr,
+    const uint8_t byte_pos,
+    const uint16_t byte_value) {
+    
+    if (byte_pos > 6 || byte_value > 0xFFFF){
+        std::cout << "!!!error setTwoByte by input value on adr " << adr;
+    }
 
     for (int i = 0; i < a.size(); i++) {
         if (a[i].adress == adr) {
             a[i].message[byte_pos] = swapByte(byte_value).first;
             a[i].message[byte_pos + 1] = swapByte(byte_value).second;
+            return 0;
+        }
+    }
+    std::cout << "!!!error set bit on adr " << adr;
+    return 1;
+}
+
+/**
+ * @brief устанавливает 2 байта в не переворачивая их подряд идущие ячейки сообщения.
+ * нужно для 16 битных сообщений
+ * @param a ссылка на вектор со всеми адресами
+ * @param adr адрес интересующего нас сообщения
+ * @param byte_pos начиная с какого байта следует установить (0 - 6).
+ * @param byte_value значение устанавливаемого значенния
+ * @return возвращает 0 при выполнении функции, при ошибках 1.
+ */
+int setTwoByteNoChange(
+    std::vector<adress_t>& a, 
+    const uint32_t adr, 
+    const uint8_t byte_pos, 
+    const uint16_t byte_value) {
+
+    if (byte_pos > 6 || byte_value > 0xFFFF) {
+        std::cout << "!!!error setTwoByteNoChange by input value on adr " << adr;
+    }
+
+    for (int i = 0; i < a.size(); i++) {
+        if (a[i].adress == adr) {
+            a[i].message[byte_pos] = swapByte(byte_value).second;
+            a[i].message[byte_pos + 1] = swapByte(byte_value).first;
             return 0;
         }
     }
@@ -751,21 +904,21 @@ int main()
     const float negative_insulation_resistance = 50000.0;//из логов
     setTwoByte(m, 0x18FFA8F3, bitToByte(48).byte, (uint32_t)(negative_insulation_resistance));
 
-    printMessageHex(m, 0x18FFA8F3);
+    /*---------------------------------------------------------0x18FFAEF3-------------------------------------*/
+
+    setCycle(m, 0x18FFAEF3, 1000);
+    setComment(m, 0x18FFA8F3, "температура гнезд");
+
+    //биты 0-0 байт 0
+
+
+
+    //printMessageHex(m, 0x18FFA8F3);
     
+
+
     
-    //printAllData(m);
+    printAllData(m);
 
 
 }
-
-// Запуск программы: CTRL+F5 или меню "Отладка" > "Запуск без отладки"
-// Отладка программы: F5 или меню "Отладка" > "Запустить отладку"
-
-// Советы по началу работы 
-//   1. В окне обозревателя решений можно добавлять файлы и управлять ими.
-//   2. В окне Team Explorer можно подключиться к системе управления версиями.
-//   3. В окне "Выходные данные" можно просматривать выходные данные сборки и другие сообщения.
-//   4. В окне "Список ошибок" можно просматривать ошибки.
-//   5. Последовательно выберите пункты меню "Проект" > "Добавить новый элемент", чтобы создать файлы кода, или "Проект" > "Добавить существующий элемент", чтобы добавить в проект существующие файлы кода.
-//   6. Чтобы снова открыть этот проект позже, выберите пункты меню "Файл" > "Открыть" > "Проект" и выберите SLN-файл.
