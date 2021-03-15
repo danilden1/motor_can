@@ -702,7 +702,7 @@ int main()
     //биты 16-23 и биты 24-31 байты 2-3
     //Максимальная и минимальная мощность разряда 10 с в кВт
     //в документе максимальная и максимальная, что странно
-    //!!!!!!!!!!!!!!!!!!------------------------------------------------ НЕ СТОЯТ ЗНАЧЕНИЯ. В ТОГАХ НУЛИ
+    //!!!!!!!!!!!!!!!!!!------------------------------------------------ НЕ СТОЯТ ЗНАЧЕНИЯ. В ЛОГАХ НУЛИ
     const float max_limit_charge_power_10_second = 0;
     const float min_limit_charge_power_10_second = 0; // 
     setByte(m, 0x18FFA7F3, bitToByte(16).byte, (uint32_t)(max_limit_charge_power_10_second / 1));
@@ -715,11 +715,43 @@ int main()
     setByte(m, 0x18FFA7F3, bitToByte(32).byte, (uint32_t)(max_limit_temperature_per_cell + 50.0));
     setByte(m, 0x18FFA7F3, bitToByte(40).byte, (uint32_t)(min_limit_temperature_per_cell + 50.0));
 
+    /*---------------------------------------------------------0x18FFA8F3-------------------------------------*/
 
+    setCycle(m, 0x18FFA8F3, 250);
+    setComment(m, 0x18FFA8F3, "состояние и уровни изоляции, уровни отказа");
+    //биты 0-7 
+    //тестер сигнала изоляции значения 0 - 255
+    setTimeCycle(m, 0x18FFA8F3, 250);
+    setTimerPos(m, 0x18FFA8F3, 0);
+    setByte(m, 0x18FFA8F3, BYTE_0, 255);
 
+    //биты 8-15
+    //состояние монитора изоляции
+    //0: работает правильно
+    //1 : Не работает должным образом
+    setByte(m, 0x18FFA8F3, bitToByte(8).byte, 1);//работает правильно
 
+    //биты 16-23
+    //Уровень отказа
+    //00: Если больше 500 Ом / В, неисправности нет.
+    //01 : Менее 500 Ом / В и более 100 Ом / В как один уровень Отказ, проверьте после остановки.
+    //10 : Менее 100 Ом / В - вторичная неисправность, отключите главное реле. Электроприборы, немедленно проверьте.
+    setByte(m, 0x18FFA8F3, bitToByte(16).byte, 0x00); //неисправности
 
-    printMessageHex(m, 0x18FFA7F3);
+    //биты 24-31 зарезервированно, нули
+    setByte(m, 0x18FFA8F3, bitToByte(24).byte, 0x00);//зарезервированно нули
+
+    //биты 32-47 байты 4-5
+    //Положительное сопротивление изоляции RGND_POS в кОм
+    const float positive_insulation_resistance = 50000.0;//из логов
+    setTwoByte(m, 0x18FFA8F3, bitToByte(32).byte, (uint32_t)(positive_insulation_resistance));
+
+    //биты 48-63 байты 6-7
+    //Положительное сопротивление изоляции RGND_POS в кОм
+    const float negative_insulation_resistance = 50000.0;//из логов
+    setTwoByte(m, 0x18FFA8F3, bitToByte(48).byte, (uint32_t)(negative_insulation_resistance));
+
+    printMessageHex(m, 0x18FFA8F3);
     
     
     //printAllData(m);
