@@ -90,6 +90,7 @@ std::vector <adress_t> m;
 
 pair_bits_t  bitToByte(const uint32_t input_bit);
 int setLower4Bites(std::vector<adress_t>& a, uint32_t adr, uint32_t byte_pos, uint8_t bits_value);
+int setPairOf12Bit(std::vector<adress_t>& a, const uint32_t adr, const uint32_t byte_pos, const uint32_t byte_value_1, const uint32_t byte_value_2);
 
 int printAdress(std::vector<adress_t> a, uint32_t adr) {
     for (int i = 0; i < a.size(); i++) {
@@ -146,7 +147,11 @@ int setMessage(std::vector<adress_t> &a, uint32_t adr, uint32_t mes[8]) {
 }
 
 //устанавливает один байт
-int setByte(std::vector<adress_t>& a, uint32_t adr, uint32_t byte_pos, uint32_t byte_value) {
+int setByte(
+    std::vector<adress_t>& a, 
+    const uint32_t adr, 
+    const uint32_t byte_pos, 
+    const uint32_t byte_value) {
 
     for (int i = 0; i < a.size(); i++) {
         if (a[i].adress == adr) {
@@ -321,6 +326,35 @@ int setTimerPos(std::vector<adress_t>& a, uint32_t adr, uint32_t pos) {
         }
     }
     std::cout << "!!!error set time cycle on adr " << adr;
+    return 1;
+}
+
+int setPairOf12Bit(
+    std::vector<adress_t>& a, 
+    const uint32_t adr, 
+    const uint32_t byte_pos, 
+    const uint32_t byte_value_1, 
+    const uint32_t byte_value_2
+) {
+
+    if (byte_value_1 > 0xFFF || byte_value_2 > 0xFFF || byte_pos > 5) {
+        std::cout << "!!!error setPairOf12Bit by input value on adr " << adr;
+        return 1;
+    }
+    for (int i = 0; i < a.size(); i++) {
+        if (a[i].adress == adr) {
+            uint32_t high_half_byte_1 = byte_value_1 >> 8;
+            uint32_t low_byte_1 = byte_value_1 % 0x100;
+            uint32_t low_half_byte_2 = byte_value_2 % 0x10;
+            uint32_t high_byte_2 = byte_value_2 >> 4;
+            setByte(a, adr, byte_pos, low_byte_1);
+            setLower4Bites(a, adr, byte_pos + 1, high_half_byte_1);
+            setByte(a, adr, byte_pos + 2, high_byte_2);
+            setUpper4Bites(a, adr, byte_pos + 1, low_half_byte_2);
+            return 0;
+        }
+    }
+    std::cout << "!!!error setPairOf12Bit by wrong adress on adr " << adr;
     return 1;
 }
 
@@ -510,8 +544,26 @@ int main()
     //!!!!!!!!!!!!!!!-----------------------СЧЕТЧИК 0-14, 15 ЗАРЕЗЕРВИРОВАНО
     setUpper4Bites(m, 0x18FFA1F3, bitToByte(60).byte, 0xe);
 
-    printMessageBin(m, 0x18FFA1F3);
-    printMessageHex(m, 0x18FFA1F3);
+
+    /*---------------------------------------------------------0x18FFA2F3-------------------------------------*/
+
+    setCycle(m, 0x18FFA2F3, 20);
+
+    //подряд 2 посылки 0-11 и 12-23
+    //напряжение АКБ, выходное напряжение
+    float battary_voltage = 0;
+    battary_voltage /= 0.2;
+
+    float output_voltage = 0;
+    output_voltage /= 0.2;
+
+    setPairOf12Bit(m, 0x18FFA2F3, 0, 0xabc, 0xdef);
+
+
+
+
+    printMessageBin(m, 0x18FFA2F3);
+    printMessageHex(m, 0x18FFA2F3);
     
     
     //printAllData(m);
