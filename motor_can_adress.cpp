@@ -360,9 +360,10 @@ int setPairOf12Bit(
 
 void printMessage(adress_t a) {
     std::cout << "0x" << std::hex << std::setfill('0') << std::setw(8) << a.adress << " | ";
-    for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < 7; i++) {
         std::cout << "0x" << std::hex << std::setfill('0') << std::setw(2) << a.message[i] << ", ";
     }
+    std::cout << "0x" << std::hex << std::setfill('0') << std::setw(2) << a.message[7] << " | ";
     std::cout << std::dec << std::setfill('0') << std::setw(4) << a.time_cycle << " | ";
     std::cout << std::dec << std::setfill('0') << std::setw(4) << a.cycle << " | ";
     std::cout << std::dec << std::setfill('0') << std::setw(4) << a.timer_pos << " | ";
@@ -548,25 +549,40 @@ int main()
     /*---------------------------------------------------------0x18FFA2F3-------------------------------------*/
 
     setCycle(m, 0x18FFA2F3, 20);
-
+    setComment(m, 0x18FFA2F3, "напряжение, ток, мощность АКБ");
     //подряд 2 посылки 0-11 и 12-23
-    //напряжение АКБ, выходное напряжение
-    float battary_voltage = 0;
-    battary_voltage /= 0.2;
-
-    float output_voltage = 0;
-    output_voltage /= 0.2;
-
-    setPairOf12Bit(m, 0x18FFA2F3, 0, 0xabc, 0xdef);
+    //напряжение АКБ, выходное напряжение в вольтах
+    const float battary_voltage = 1.8;
+    //battary_voltage /= 0.2;
+    const float output_voltage = 512.6;
+    //output_voltage /= 0.2;
+    setPairOf12Bit(m, 0x18FFA2F3, BYTE_0, (uint32_t)(battary_voltage / 0.2), (uint32_t)(output_voltage / 0.2));
 
 
+    //биты 24-39 или байты 3 и 4
+    //ток батареи в амперах
+    const float battary_current = 486.32;
+    //battary_current = (battary_current + 500.0) / 0.02;
+    setTwoByte(m, 0x18FFA2F3, BYTE_3, (uint32_t)((battary_current + 500.0) / 0.02));
 
 
-    printMessageBin(m, 0x18FFA2F3);
+    //биты 40-55 или байты 5 и 6
+    //мощьность батареи в кВт
+    const float battary_power = (output_voltage * battary_current) / 1000;
+    setTwoByte(m, 0x18FFA2F3, BYTE_5, (uint32_t)((battary_power + 325) / 0.01));
+
+
+    /*---------------------------------------------------------0x18FFA3F3-------------------------------------*/
+    
+    setCycle(m, 0x18FFA3F3, 1000);
+    setComment(m, 0x18FFA3F3, "онлайн статусы, количество АКБ ящиков, номер ведомого, версия ПО");
+    
+    
+    
     printMessageHex(m, 0x18FFA2F3);
     
     
-    //printAllData(m);
+    printAllData(m);
 
 
 }
