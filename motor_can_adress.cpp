@@ -554,7 +554,7 @@ int main()
     //напряжение АКБ, выходное напряжение в вольтах
     const float battary_voltage = 1.8;
     //battary_voltage /= 0.2;
-    const float output_voltage = 512.6;
+    const float output_voltage = 316.9;
     //output_voltage /= 0.2;
     setPairOf12Bit(m, 0x18FFA2F3, BYTE_0, (uint32_t)(battary_voltage / 0.2), (uint32_t)(output_voltage / 0.2));
 
@@ -577,12 +577,65 @@ int main()
     setCycle(m, 0x18FFA3F3, 1000);
     setComment(m, 0x18FFA3F3, "онлайн статусы, количество АКБ ящиков, номер ведомого, версия ПО");
     
+    //биты 0-31 или байты 0-3 
+    //задаются номера онлайн устройств. Списано с логов 
+    setByte(m, 0x18FFA3F3, BYTE_0, 0x0f); // списано с логов. может быть 0x00
+    setByte(m, 0x18FFA3F3, BYTE_1, 0x00); // списано с логов.
+    setByte(m, 0x18FFA3F3, BYTE_2, 0x00); // списано с логов.
+    setByte(m, 0x18FFA3F3, BYTE_3, 0x00); // списано с логов.
+
+    //биты 32-39 или байт 4
+    //количество аккумуляторнх ящиков списано с логов значения в диапазоне 1-16
+    setByte(m, 0x18FFA3F3, BYTE_4, 0x02); // списано с логов. 2 ящика
+
+    //биты 40-48 или байт 5
+    //номер ведомого списано с логов значения в диапазоне 1-32
+    setByte(m, 0x18FFA3F3, BYTE_5, 0x04); // списано с логов. ведовый четвертый
+
+    //бит 48 статус программного обеспечения
+    //биты 49-63 номер версии ПО
+    //чтобы не плодить функции типа setNBits напишим все руками
+
+    //0 представляет статус образца
+    //1 представляет статус партии
+    bool software_status = 0; //статус образца
+    uint32_t software_version = 1; //версия 1;
+    setTwoByte(m, 0x18FFA3F3, BYTE_6, (uint32_t)(software_status + (software_version << 1)));
+
+    /*---------------------------------------------------------0x18FFA4F3-------------------------------------*/
+    
+    setCycle(m, 0x18FFA4F3, 100);
+    setComment(m, 0x18FFA4F3, "описание ячеек АКБ");
+
+    //биты 0-15 байты 0 и 1
+    //сумма напряжения ячеек
+    const float battary_cell_voltage_summ = output_voltage;
+    setTwoByte(m, 0x18FFA4F3, BYTE_0, (uint32_t)(battary_cell_voltage_summ / 0.01));
+    
+    //биты 16-27 и биты 28-39 байты 2-4
+    //максимальное и минимальное напряжение ячеек в вольтах
+    const float min_voltage_per_cell = 2.2;
+    const float max_voltage_per_cell = 2.2;
+    setPairOf12Bit(m, 0x18FFA4F3, BYTE_2, (uint32_t)(max_voltage_per_cell / 0.0015),
+        (uint32_t)(min_voltage_per_cell / 0.0015));
+
+    //биты 40-47 ячейка с максимальным напряжением
+    //биты 48-55 ячейка с минимальным напряжением
+    setByte(m, 0x18FFA4F3, bitToByte(40).byte, 1); //у первой ячейки максимальное напряжение
+    setByte(m, 0x18FFA4F3, bitToByte(48).byte, 2); //у второй ячейки минимальное напряжение
+
+    //биты 56-59 системный номер ячецки с самым высоким напряжением
+    setLower4Bites(m, 0x18FFA4F3, bitToByte(56).byte, 1);//первыя ячейка, как в логах
+
+    //биты 60-63 системный номер ячецки с самым низким напряжением
+    setUpper4Bites(m, 0x18FFA4F3, bitToByte(60).byte, 3);//третья ячейка, как в логах
+
+    /*---------------------------------------------------------0x18FFA4F3-------------------------------------*/
+
+    printMessageHex(m, 0x18FFA4F3);
     
     
-    printMessageHex(m, 0x18FFA2F3);
-    
-    
-    printAllData(m);
+    //printAllData(m);
 
 
 }
