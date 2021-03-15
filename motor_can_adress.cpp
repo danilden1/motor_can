@@ -36,6 +36,7 @@
 #define ad0x0CFF0308 26
 #define ad0x0CFF0408 27
 #define ad0x0CFF0508 28
+#define ad0x1811A6A0 29
 
 
 #define BYTE_0 0
@@ -328,7 +329,7 @@ int main()
     my.time_cycle = 0;
     my.timer_pos = 0;
     my.comment = "comment";
-    for (int i = 0; i < 29; i++) {
+    for (int i = 0; i < 30; i++) {
         m.push_back(my);
     }
     m[ad0x18FFA0F3].adress = 0x18FFA0F3;
@@ -360,6 +361,7 @@ int main()
         m[ad0x0CFF0308].adress = 0x0CFF0308;
         m[ad0x0CFF0408].adress = 0x0CFF0408;
         m[ad0x0CFF0508].adress = 0x0CFF0508;
+        m[ad0x1811A6A0].adress = 0x1811A6A0;
 
     std::cout << "size: " << m.size() << std::endl;
 
