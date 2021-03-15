@@ -15,10 +15,12 @@ Debug/*
 /Debug/*
 /Debug
 
-/.vs/
+.vs/
 .vs/*
-/.vs/*
-/.vs
+.vs/**
+.vs/**.*
+
+
 /*.bin
 /*.list
 /*.mk

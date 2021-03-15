@@ -318,6 +318,7 @@ void printAllData(std::vector<adress_t> a) {
 
 int main()
 {
+    //test comment
     setlocale(LC_ALL, "Russian");
     
     adress_t my; // вектор всех адресов
