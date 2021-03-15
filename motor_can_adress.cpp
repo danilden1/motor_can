@@ -88,6 +88,9 @@ uint8_t bits_arr[8] = {
 typedef uint32_t mes_t[8];
 std::vector <adress_t> m;
 
+pair_bits_t  bitToByte(const uint32_t input_bit);
+int setLower4Bites(std::vector<adress_t>& a, uint32_t adr, uint32_t byte_pos, uint8_t bits_value);
+
 int printAdress(std::vector<adress_t> a, uint32_t adr) {
     for (int i = 0; i < a.size(); i++) {
         if (a[i].adress == adr) {
@@ -155,6 +158,24 @@ int setByte(std::vector<adress_t>& a, uint32_t adr, uint32_t byte_pos, uint32_t 
     return 1;
 }
 
+int set12Bits(std::vector<adress_t>& a, uint32_t adr, uint32_t bit_pos, uint32_t byte_value) {
+    if (bit_pos > 50 || byte_value > 0xFFF) {
+        std::cout << "!!!error set12Bits on adr " << adr;
+        return 1;
+    }
+    for (int i = 0; i < a.size(); i++) {
+        if (a[i].adress == adr) {
+            uint32_t loc_byte_pos = bitToByte(bit_pos).byte;
+            uint32_t high_half_byte = byte_value >> 8;
+            uint32_t low_byte = byte_value % 0x100;
+            setByte(a, adr, loc_byte_pos, low_byte);
+            setLower4Bites(a, adr, loc_byte_pos + 1, high_half_byte);
+            return 0;
+        }
+    }
+
+
+}
 
 
 int setBit(std::vector<adress_t>& a, uint32_t adr, uint32_t bit_pos, uint32_t byte_pos) {
@@ -470,16 +491,30 @@ int main()
 
 
 
-    //биты 32-47 байты 
+    //биты 32-47 байты 4 и 5
     //сопративление батареи
     float battary_resistance = 0.005; //сопративление батареи 5 мОм
     battary_resistance /= 0.001;
-    setTwoByte(m, 0x18FFA1F3, bitToByte(33).byte, (uint32_t)(battary_resistance));
+    setTwoByte(m, 0x18FFA1F3, bitToByte(32).byte, (uint32_t)(battary_resistance));
 
+    //биты 48-59 
+    //остаточная емкость
+    float residual_capacity = 2.2; //ампер часа
+    residual_capacity /= 0.1;
+    //set12Bits(m, 0x18FFA1F3, 48, (uint32_t)(0xABC));
+    set12Bits(m, 0x18FFA1F3, 48, (uint32_t)(residual_capacity));
+    
+
+    //биты 60-63
+    //счетчик каждые 100 мс
+    //!!!!!!!!!!!!!!!-----------------------СЧЕТЧИК 0-14, 15 ЗАРЕЗЕРВИРОВАНО
+    setUpper4Bites(m, 0x18FFA1F3, bitToByte(60).byte, 0xe);
 
     printMessageBin(m, 0x18FFA1F3);
     printMessageHex(m, 0x18FFA1F3);
-    printAllData(m);
+    
+    
+    //printAllData(m);
 
 
 }
