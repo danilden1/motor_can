@@ -630,12 +630,41 @@ int main()
     //биты 60-63 системный номер ячецки с самым низким напряжением
     setUpper4Bites(m, 0x18FFA4F3, bitToByte(60).byte, 3);//третья ячейка, как в логах
 
-    /*---------------------------------------------------------0x18FFA4F3-------------------------------------*/
+    /*---------------------------------------------------------0x18FFA5F3-------------------------------------*/
 
-    printMessageHex(m, 0x18FFA4F3);
+    setCycle(m, 0x18FFA5F3, 100);
+    setComment(m, 0x18FFA5F3, "температура");
+
+    //биты 0-15 или байты 0-1
+    //средняя температура мономера в градусах цельсия
+    const float monomer_mean_temperature = 40.0;
+    setTwoByte(m, 0x18FFA5F3, BYTE_0, (uint32_t)((monomer_mean_temperature + 50.0) / 0.2));
+
+    //биты 16-27 и биты 28-39 байты 2-4
+    //максимальное и минимальное значение температуры
+    const float max_temperature = 30.1;
+    const float min_temperature = 30.0;
+    setPairOf12Bit(m, 0x18FFA5F3, bitToByte(16).byte, (uint32_t)((max_temperature + 50.0) / 0.2),
+        (uint32_t)((min_temperature + 50.0) / 0.2));
+
+    //биты 40-47 ячейка с максимальной температурой
+    //биты 48-55 ячейка с минимальной температурой
+    setByte(m, 0x18FFA5F3, bitToByte(40).byte, 1); //у первой ячейки максимальная температура
+    setByte(m, 0x18FFA5F3, bitToByte(48).byte, 2); //у второй ячейки минимальная температура
+
+    //биты 56-59 Номер ящика, где находится самая высокая температура
+    setLower4Bites(m, 0x18FFA4F3, bitToByte(56).byte, 1);//первый ящик, как в логах
+
+    //биты 60-63 Номер ящика, где находится самая низкая температура
+    setUpper4Bites(m, 0x18FFA4F3, bitToByte(60).byte, 3);//третий ящик, как в логах
+
+         
+
+
+    //printMessageHex(m, 0x18FFA4F3);
     
     
-    //printAllData(m);
+    printAllData(m);
 
 
 }
