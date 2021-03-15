@@ -666,7 +666,7 @@ int main()
     
     //биты 0-15 и биты 16-23 байты 0-2
     //Пределы максимального и минимального напряжений блока в вольтах
-    const float max_limit_voltage_per_block = 725.4; // очень странные значения
+    const float max_limit_voltage_per_block = 725.4; // очень странные значения 
     const float min_limit_voltage_per_block = 2.4; // очень странные значения
     setPairOf12Bit(m, 0x18FFA6F3, bitToByte(0).byte, (uint32_t)(max_limit_voltage_per_block / 0.2),
         (uint32_t)(min_limit_voltage_per_block / 0.2));
@@ -684,14 +684,45 @@ int main()
     //И масштаб очень странный
     const float max1_limit_charge_current = 39.2; 
     const float max2_limit_charge_current = 16;
-    setByte(m, 0x18FFA6F3, bitToByte(48).byte, (uint32_t)(max1_limit_charge_current / 2));
-    setByte(m, 0x18FFA6F3, bitToByte(56).byte, (uint32_t)(max2_limit_charge_current / 2));
+    setByte(m, 0x18FFA6F3, bitToByte(48).byte, (uint32_t)(max1_limit_charge_current / 2.0));
+    setByte(m, 0x18FFA6F3, bitToByte(56).byte, (uint32_t)(max2_limit_charge_current / 2.0));
+
+    /*---------------------------------------------------------0x18FFA7F3-------------------------------------*/
+
+    setCycle(m, 0x18FFA7F3, 50);
+    setComment(m, 0x18FFA7F3, "пределы soc, мощьность заряда 10с, температуры ячеек");
+
+    //биты 0-7 и биты 8-15 байты 0-1
+    //Максимальный и минимальный пределы SOC в процентах
+    const float max_limit_soc = 100; // из логов, что логично
+    const float min_limit_soc = 5; // 
+    setByte(m, 0x18FFA7F3, bitToByte(0).byte, (uint32_t)(max_limit_soc / 0.5));
+    setByte(m, 0x18FFA7F3, bitToByte(8).byte, (uint32_t)(min_limit_soc / 0.5));
+
+    //биты 16-23 и биты 24-31 байты 2-3
+    //Максимальная и минимальная мощность разряда 10 с в кВт
+    //в документе максимальная и максимальная, что странно
+    //!!!!!!!!!!!!!!!!!!------------------------------------------------ НЕ СТОЯТ ЗНАЧЕНИЯ. В ТОГАХ НУЛИ
+    const float max_limit_charge_power_10_second = 0;
+    const float min_limit_charge_power_10_second = 0; // 
+    setByte(m, 0x18FFA7F3, bitToByte(16).byte, (uint32_t)(max_limit_charge_power_10_second / 1));
+    setByte(m, 0x18FFA7F3, bitToByte(24).byte, (uint32_t)(min_limit_charge_power_10_second / 1));
+
+    //биты 32-39 и биты 40-47 байты 4-5
+    //Максимальная и минимальная температуры ячеек в градусах
+    const float max_limit_temperature_per_cell = 60.0; //значение из логов
+    const float min_limit_temperature_per_cell = -19.0; //значение из логов
+    setByte(m, 0x18FFA7F3, bitToByte(32).byte, (uint32_t)(max_limit_temperature_per_cell + 50.0));
+    setByte(m, 0x18FFA7F3, bitToByte(40).byte, (uint32_t)(min_limit_temperature_per_cell + 50.0));
 
 
-    printMessageHex(m, 0x18FFA6F3);
+
+
+
+    printMessageHex(m, 0x18FFA7F3);
     
     
-    printAllData(m);
+    //printAllData(m);
 
 
 }
