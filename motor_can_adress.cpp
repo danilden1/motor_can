@@ -38,6 +38,27 @@
 #define ad0x0CFF0508 28
 
 
+#define BYTE_0 0
+#define BYTE_1 1
+#define BYTE_2 2
+#define BYTE_3 3
+#define BYTE_4 4
+#define BYTE_5 5
+#define BYTE_6 6
+#define BYTE_7 7
+
+#define BIT_0 0 
+#define BIT_1 1 
+#define BIT_2 2 
+#define BIT_3 3 
+#define BIT_4 4 
+#define BIT_5 5 
+#define BIT_6 6 
+#define BIT_7 6 
+
+
+
+
 typedef struct {
     uint32_t adress;
     uint32_t message[8];
@@ -388,7 +409,7 @@ int main()
     //+++3 = замкнуть главный контактор(высокое напряжение замкнуто) 3 соответствует режиму работы от батаре
     //4 = Главный контактор отключен из - за неисправности, Безвозвратно[5 соответствует режиму работы от батареи]
     //5 ~ 15 = зарезервирован
-    setLower4Bites(m, 0x18FFA1F3, 0, 3);
+    setLower4Bites(m, 0x18FFA1F3, BYTE_0, 3);
 
     //биты 4-7 режим  работы от  батареи верхние биты
     //0 = загрузка
@@ -402,12 +423,12 @@ int main()
     //8 = штекерный пистолет постоянного тока не заряжен
     //9 = вилка переменного тока не заряжена
     //10 ~15 = зарезервирован
-    setUpper4Bites(m, 0x18FFA1F3, 0, 3);
+    setUpper4Bites(m, 0x18FFA1F3, BYTE_0, 3);
    
 
     //биты 8-11 нижние биты первого байта ошибки BMS
     //ошибок нет, все нули
-    setLower4Bites(m, 0x18FFA1F3, 1, 0);
+    setLower4Bites(m, 0x18FFA1F3, BYTE_1, 0);
 
     //биты 12-13 или биты 4 и 5 первого байта
     //состояние баланчировки
@@ -421,13 +442,13 @@ int main()
     //SOC
     float soc = 98.56; // значение в процентах
     soc /= 0.5;
-    setByte(m, 0x18FFA1F3, 2, (uint32_t)(soc));
+    setByte(m, 0x18FFA1F3, BYTE_2, (uint32_t)(soc));
 
-    //биты 24-23 или третий байт
+    //биты 24-31 или третий байт
     //SOH здрорвье аккумулятора у нас аккум новый и он полон сил, поэтому 100%
     float soh = 100.00;
     soh /= 0.5;
-    setByte(m, 0x18FFA1F3, 3, (uint32_t)(soh));
+    setByte(m, 0x18FFA1F3, BYTE_3, (uint32_t)(soh));
 
     printMessageBin(m, 0x18FFA1F3);
     printMessageHex(m, 0x18FFA1F3);

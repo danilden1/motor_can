@@ -1,22 +1,22 @@
 ﻿  motor_can_adress.cpp
-C:\Users\danil\source\repos\motor_can_adress\motor_can_adress.cpp(65,23): warning C4018: <: несоответствие типов со знаком и без знака
-C:\Users\danil\source\repos\motor_can_adress\motor_can_adress.cpp(75,23): warning C4018: <: несоответствие типов со знаком и без знака
-C:\Users\danil\source\repos\motor_can_adress\motor_can_adress.cpp(90,23): warning C4018: <: несоответствие типов со знаком и без знака
-C:\Users\danil\source\repos\motor_can_adress\motor_can_adress.cpp(106,23): warning C4018: <: несоответствие типов со знаком и без знака
-C:\Users\danil\source\repos\motor_can_adress\motor_can_adress.cpp(121,23): warning C4018: <: несоответствие типов со знаком и без знака
-C:\Users\danil\source\repos\motor_can_adress\motor_can_adress.cpp(133,23): warning C4018: <: несоответствие типов со знаком и без знака
-C:\Users\danil\source\repos\motor_can_adress\motor_can_adress.cpp(145,23): warning C4018: <: несоответствие типов со знаком и без знака
-C:\Users\danil\source\repos\motor_can_adress\motor_can_adress.cpp(157,23): warning C4018: <: несоответствие типов со знаком и без знака
-C:\Users\danil\source\repos\motor_can_adress\motor_can_adress.cpp(173,23): warning C4018: <: несоответствие типов со знаком и без знака
-C:\Users\danil\source\repos\motor_can_adress\motor_can_adress.cpp(218,23): warning C4018: <: несоответствие типов со знаком и без знака
-C:\Users\danil\source\repos\motor_can_adress\motor_can_adress.cpp(231,23): warning C4018: <: несоответствие типов со знаком и без знака
-C:\Users\danil\source\repos\motor_can_adress\motor_can_adress.cpp(243,23): warning C4018: <: несоответствие типов со знаком и без знака
-C:\Users\danil\source\repos\motor_can_adress\motor_can_adress.cpp(255,23): warning C4018: <: несоответствие типов со знаком и без знака
-C:\Users\danil\source\repos\motor_can_adress\motor_can_adress.cpp(267,23): warning C4018: <: несоответствие типов со знаком и без знака
-C:\Users\danil\source\repos\motor_can_adress\motor_can_adress.cpp(290,23): warning C4018: <: несоответствие типов со знаком и без знака
-C:\Users\danil\source\repos\motor_can_adress\motor_can_adress.cpp(361,36): warning C4305: инициализация: усечение из "double" в "float"
-C:\Users\danil\source\repos\motor_can_adress\motor_can_adress.cpp(363,29): warning C4305: /=: усечение из "double" в "float"
-C:\Users\danil\source\repos\motor_can_adress\motor_can_adress.cpp(370,25): warning C4305: инициализация: усечение из "double" в "float"
-C:\Users\danil\source\repos\motor_can_adress\motor_can_adress.cpp(371,20): warning C4305: /=: усечение из "double" в "float"
-C:\Users\danil\source\repos\motor_can_adress\motor_can_adress.cpp(422,22): warning C4305: инициализация: усечение из "double" в "float"
+C:\Users\danil\source\repos\motor_can_adress\motor_can_adress.cpp(86,23): warning C4018: <: несоответствие типов со знаком и без знака
+C:\Users\danil\source\repos\motor_can_adress\motor_can_adress.cpp(96,23): warning C4018: <: несоответствие типов со знаком и без знака
+C:\Users\danil\source\repos\motor_can_adress\motor_can_adress.cpp(111,23): warning C4018: <: несоответствие типов со знаком и без знака
+C:\Users\danil\source\repos\motor_can_adress\motor_can_adress.cpp(127,23): warning C4018: <: несоответствие типов со знаком и без знака
+C:\Users\danil\source\repos\motor_can_adress\motor_can_adress.cpp(142,23): warning C4018: <: несоответствие типов со знаком и без знака
+C:\Users\danil\source\repos\motor_can_adress\motor_can_adress.cpp(154,23): warning C4018: <: несоответствие типов со знаком и без знака
+C:\Users\danil\source\repos\motor_can_adress\motor_can_adress.cpp(166,23): warning C4018: <: несоответствие типов со знаком и без знака
+C:\Users\danil\source\repos\motor_can_adress\motor_can_adress.cpp(178,23): warning C4018: <: несоответствие типов со знаком и без знака
+C:\Users\danil\source\repos\motor_can_adress\motor_can_adress.cpp(194,23): warning C4018: <: несоответствие типов со знаком и без знака
+C:\Users\danil\source\repos\motor_can_adress\motor_can_adress.cpp(239,23): warning C4018: <: несоответствие типов со знаком и без знака
+C:\Users\danil\source\repos\motor_can_adress\motor_can_adress.cpp(252,23): warning C4018: <: несоответствие типов со знаком и без знака
+C:\Users\danil\source\repos\motor_can_adress\motor_can_adress.cpp(264,23): warning C4018: <: несоответствие типов со знаком и без знака
+C:\Users\danil\source\repos\motor_can_adress\motor_can_adress.cpp(276,23): warning C4018: <: несоответствие типов со знаком и без знака
+C:\Users\danil\source\repos\motor_can_adress\motor_can_adress.cpp(288,23): warning C4018: <: несоответствие типов со знаком и без знака
+C:\Users\danil\source\repos\motor_can_adress\motor_can_adress.cpp(311,23): warning C4018: <: несоответствие типов со знаком и без знака
+C:\Users\danil\source\repos\motor_can_adress\motor_can_adress.cpp(382,36): warning C4305: инициализация: усечение из "double" в "float"
+C:\Users\danil\source\repos\motor_can_adress\motor_can_adress.cpp(384,29): warning C4305: /=: усечение из "double" в "float"
+C:\Users\danil\source\repos\motor_can_adress\motor_can_adress.cpp(391,25): warning C4305: инициализация: усечение из "double" в "float"
+C:\Users\danil\source\repos\motor_can_adress\motor_can_adress.cpp(392,20): warning C4305: /=: усечение из "double" в "float"
+C:\Users\danil\source\repos\motor_can_adress\motor_can_adress.cpp(443,22): warning C4305: инициализация: усечение из "double" в "float"
   motor_can_adress.vcxproj -> C:\Users\danil\source\repos\motor_can_adress\Debug\motor_can_adress.exe
