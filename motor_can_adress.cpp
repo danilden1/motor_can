@@ -568,8 +568,8 @@ int main()
 
     //биты 40-55 или байты 5 и 6
     //мощьность батареи в кВт
-    const float battary_power = (output_voltage * battary_current) / 1000;
-    setTwoByte(m, 0x18FFA2F3, BYTE_5, (uint32_t)((battary_power + 325) / 0.01));
+    const float battary_power = (output_voltage * battary_current) / 1000.0;
+    setTwoByte(m, 0x18FFA2F3, BYTE_5, (uint32_t)((battary_power + 325.0) / 0.01));
 
 
     /*---------------------------------------------------------0x18FFA3F3-------------------------------------*/
@@ -653,15 +653,42 @@ int main()
     setByte(m, 0x18FFA5F3, bitToByte(48).byte, 2); //у второй ячейки минимальная температура
 
     //биты 56-59 Номер ящика, где находится самая высокая температура
-    setLower4Bites(m, 0x18FFA4F3, bitToByte(56).byte, 1);//первый ящик, как в логах
+    setLower4Bites(m, 0x18FFA5F3, bitToByte(56).byte, 1);//первый ящик, как в логах
 
     //биты 60-63 Номер ящика, где находится самая низкая температура
-    setUpper4Bites(m, 0x18FFA4F3, bitToByte(60).byte, 3);//третий ящик, как в логах
-
-         
+    setUpper4Bites(m, 0x18FFA5F3, bitToByte(60).byte, 3);//третий ящик, как в логах
 
 
-    //printMessageHex(m, 0x18FFA4F3);
+    /*---------------------------------------------------------0x18FFA6F3-------------------------------------*/
+
+    setCycle(m, 0x18FFA6F3, 250);
+    setComment(m, 0x18FFA6F3, "пределы тока и напряжения");
+    
+    //биты 0-15 и биты 16-23 байты 0-2
+    //Пределы максимального и минимального напряжений блока в вольтах
+    const float max_limit_voltage_per_block = 725.4; // очень странные значения
+    const float min_limit_voltage_per_block = 2.4; // очень странные значения
+    setPairOf12Bit(m, 0x18FFA6F3, bitToByte(0).byte, (uint32_t)(max_limit_voltage_per_block / 0.2),
+        (uint32_t)(min_limit_voltage_per_block / 0.2));
+
+
+    //биты 24-35 и биты 36-47 байты 3-5
+    // Пределы максимального и минимального напряжений ячейки в вольтах
+    const float max_limit_voltage_per_cell = 1.686; // очень странные значения
+    const float min_limit_voltage_per_cell = 0.0195; // очень странные значения
+    setPairOf12Bit(m, 0x18FFA6F3, bitToByte(24).byte, (uint32_t)(max_limit_voltage_per_cell / 0.0015),
+        (uint32_t)(min_limit_voltage_per_cell / 0.0015));
+
+    //биты 48-55 и биты 56-63 байты 6 и 7
+    // Максимальный и максимальный пределы тока разряда в амперах. Очень странно
+    //И масштаб очень странный
+    const float max1_limit_charge_current = 39.2; 
+    const float max2_limit_charge_current = 16;
+    setByte(m, 0x18FFA6F3, bitToByte(48).byte, (uint32_t)(max1_limit_charge_current / 2));
+    setByte(m, 0x18FFA6F3, bitToByte(56).byte, (uint32_t)(max2_limit_charge_current / 2));
+
+
+    printMessageHex(m, 0x18FFA6F3);
     
     
     printAllData(m);
