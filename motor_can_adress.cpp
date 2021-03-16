@@ -161,10 +161,17 @@ int printArraysByCycle(
     std::cout << "--------------------- SORT ADRESS BY CYCLES TIME ---------------------" << std::endl;
     
     for (int i = 0; i < CYC_TIMES; i++) {
-        std::cout << "cycle: " << std::dec << cycles_arr[i] << std::endl;
+        std::cout << "_______________CYCLE_________________: " << std::dec << cycles_arr[i] << std::endl;
         for (int j = 0; j < a.size(); j++) {
             if (a[j].cycle == cycles_arr[i]) {
-                std::cout << "0x" << std::hex << std::setfill('0') << std::setw(8) << a[j].adress << std::endl;
+                std::cout << "#define ____0x" << std::hex << std::setfill('0') << std::setw(8) << a[j].adress << std::endl;
+                std::cout << "      msg.Id = 0x" << std::hex << std::setfill('0') << std::setw(8) << a[j].adress << ";" << std::endl;
+                std::cout << "      msg.bStdId = 0;" << std::endl;
+                std::cout << "      msg.Dlc = 8;" << std::endl;
+                std::cout << "      memcpy(msg.TxData, data0x" << std::hex << std::setfill('0') << std::setw(8) << a[j].adress << ", 8);" << std::endl;
+                std::cout << "      osMessageQueuePut (myCanTxQueueHandle, &msg, NULL, 2);" << std::endl;
+                std::cout << std::endl;
+
             }
         }
         std::cout << std::endl;
@@ -1196,7 +1203,7 @@ int main()
 
     //биты 48-55
     //максимальная температура Cell_Max_Temp
-     const uint32_t Batt_Volt_INS2 = 21; //из логов
+     //const uint32_t Batt_Volt_INS2 = 21; //из логов
     //setByte(m, 0x1810A6A0, bitToByte(48).byte, Cell_Max_Temp);
 
     //Insul_Resistance
