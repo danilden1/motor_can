@@ -40,5 +40,6 @@ C:\Users\danil\source\repos\motor_can_adress\motor_can_adress.cpp(959,50): warni
 C:\Users\danil\source\repos\motor_can_adress\motor_can_adress.cpp(966,51): warning C4305: инициализация: усечение из "double" в "float"
 C:\Users\danil\source\repos\motor_can_adress\motor_can_adress.cpp(967,52): warning C4305: инициализация: усечение из "double" в "float"
 C:\Users\danil\source\repos\motor_can_adress\motor_can_adress.cpp(974,49): warning C4305: инициализация: усечение из "double" в "float"
+C:\Users\danil\source\repos\motor_can_adress\motor_can_adress.cpp(1144,45): warning C4305: инициализация: усечение из "double" в "float"
 C:\Users\danil\source\repos\motor_can_adress\motor_can_adress.cpp(305): warning C4715: set12Bits: значение возвращается не при всех путях выполнения
   motor_can_adress.vcxproj -> C:\Users\danil\source\repos\motor_can_adress\Debug\motor_can_adress.exe
