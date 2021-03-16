@@ -6,6 +6,7 @@
 #include <string>
 #include <bitset>
 #include <iomanip>
+#include <stdint.h>
 
 //TODO: проверить функции установки двух байт. можкт быть не везде нужно байти вестами менять
 //TODO: написать генератор массивов для вставки его в проект Дмитрия для STM
@@ -67,12 +68,17 @@
 
 typedef struct {
     uint32_t adress;
-    uint32_t message[8];
+    uint8_t message[8];
     uint32_t cycle; // время повторения посылки
     uint32_t time_cycle; // время обновления таймера, если 0, то аймера нет
     uint32_t timer_pos; //позиция первого бита в таймере. предполагается, что таймеры 4х битные.
     std::string comment; //содержание сообщения
 }adress_t;
+
+typedef struct {
+    uint32_t adress;
+
+};
 
 typedef struct {
     uint8_t byte;
@@ -143,7 +149,7 @@ int printMessageHex(
         if (a[i].adress == adr) {
             std::cout << "adr 0x" << std::hex << adr << ": ";
             for (int j = 0; j < 8; j++) {
-                std::cout << "0x"<< std::hex << std::setfill('0') << std::setw(2) << a[i].message[j] << ", ";
+                std::cout << "0x"<< std::hex << std::setfill('0') << std::setw(2) << static_cast<int>(a[i].message[j]) << ", ";
             }
             std::cout << std::endl;
             return 1;
@@ -571,9 +577,9 @@ int setPairOf12Bit(
 void printMessage(adress_t a) {
     std::cout << "0x" << std::hex << std::setfill('0') << std::setw(8) << a.adress << " | ";
     for (int i = 0; i < 7; i++) {
-        std::cout << "0x" << std::hex << std::setfill('0') << std::setw(2) << a.message[i] << ", ";
+        std::cout << "0x" << std::hex << std::setfill('0') << std::setw(2) << static_cast<int>(a.message[i]) << ", ";
     }
-    std::cout << "0x" << std::hex << std::setfill('0') << std::setw(2) << a.message[7] << " | ";
+    std::cout << "0x" << std::hex << std::setfill('0') << std::setw(2) << static_cast<int>(a.message[7]) << " | ";
     std::cout << std::dec << std::setfill('0') << std::setw(4) << a.time_cycle << " | ";
     std::cout << std::dec << std::setfill('0') << std::setw(4) << a.cycle << " | ";
     std::cout << std::dec << std::setfill('0') << std::setw(4) << a.timer_pos << " | ";
@@ -974,13 +980,80 @@ int main()
     /*---------------------------------------------------------0x18FFAEF3-------------------------------------*/
 
     setCycle(m, 0x18FFAEF3, 1000);
-    setComment(m, 0x18FFA8F3, "температура гнезд");
+    setComment(m, 0x18FFAEF3, "температура гнезд");
+
+    //биты 0-7 и 8-15 
+    //положительная и отрецательная температура гнезда быстрой зарядки
+    const float positive_fast_charge_socket_temperature = 15; //из логов
+    const float negative_fast_charge_socket_temperature = 15; //из логов
+    setByte(m, 0x18FFAEF3, bitToByte(0).byte, (uint32_t)(positive_fast_charge_socket_temperature));
+    setByte(m, 0x18FFAEF3, bitToByte(8).byte, (uint32_t)(negative_fast_charge_socket_temperature));
+
+    //биты 16-23 и 24-31 
+    //положительная и отрецательная температура гнезда медленной зарядки
+    const float positive_slow_charge_socket_temperature = 15; //из логов
+    const float negative_slow_charge_socket_temperature = 15; //из логов
+    setByte(m, 0x18FFAEF3, bitToByte(0).byte, (uint32_t)(positive_slow_charge_socket_temperature));
+    setByte(m, 0x18FFAEF3, bitToByte(8).byte, (uint32_t)(negative_slow_charge_socket_temperature));
+
+    //биты 32-39 40-47 48-55 56-63 
+    //зарезервировано, все нули
+    setByte(m, 0x18FFAEF3, bitToByte(32).byte, 0x00); // зарезервировано все нули
+    setByte(m, 0x18FFAEF3, bitToByte(40).byte, 0x00); // зарезервировано все нули
+    setByte(m, 0x18FFAEF3, bitToByte(48).byte, 0x00); // зарезервировано все нули
+    setByte(m, 0x18FFAEF3, bitToByte(56).byte, 0x00); // зарезервировано все нули
+
+     /*---------------------------------------------------------0x18FFA9F3-------------------------------------*/
+
+    setCycle(m, 0x18FFA9F3, 1000);
+    setComment(m, 0x18FFA9F3, "количество АКБ, мономеров, датчиков температуры, отказов АКБ");
+
+    //биты 0-7 
+    //Количество аккумуляторных подсистем
+    uint32_t quanity_bettary_subsystem = 0; //из логов
+    setByte(m, 0x18FFA9F3, bitToByte(0).byte, quanity_bettary_subsystem);
+
+    //биты 8-23
+    //Общее количество мономеров
+    uint32_t quanity_of_monomer =234; //из логов
+    setTwoByte(m, 0x18FFA9F3, bitToByte(8).byte, quanity_of_monomer);
+
+    //биты 24-31
+    //Общее количество датчиков температуры
+    uint32_t quanity_of_temperature_sensor = 40; //из логов
+    setByte(m, 0x18FFA9F3, bitToByte(24).byte, quanity_of_temperature_sensor);
+
+    //биты 32-39
+    //Общее количество отказов аккумуляторных батарей
+    uint32_t quanity_of_battary_error = 0; //отказов нет
+    setByte(m, 0x18FFA9F3, bitToByte(32).byte, quanity_of_battary_error);
+
+
+    //биты 40-47
+    //Состояние зарядки аккумулятора
+    //1. Парковка и зарядка;
+    //2. Вождение и зарядка;
+    //3. Незаряженное состояние;
+    //4. Зарядка завершена;
+    //«0xFE» означает ненормальное,
+    //«0xFF» означает недопустимый
+    setByte(m, 0x18FFA9F3, bitToByte(32).byte, 0x04); //зарядка завершена
+
+    //биты 48-63
+    //Оставшееся время зарядки аккумулятора в мин
+    //!!!!!!!!!-----------------------------------------------FFFF, когда пистолет вставлен и заряжен, и при нормальной зарядке.
+    uint32_t remaining_battery_charging_time = 10;
+    //setTwoByte(m, 0x18FFA9F3, bitToByte(32).byte, remaining_battery_charging_time);
+    setTwoByte(m, 0x18FFA9F3, bitToByte(32).byte, 0x04);
+
+
+
 
     //биты 0-0 байт 0
 
 
 
-    //printMessageHex(m, 0x18FFA8F3);
+    printMessageHex(m, 0x18FFA9F3);
     
 
 
