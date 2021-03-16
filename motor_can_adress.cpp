@@ -13,6 +13,8 @@
 //TODO: написать сортировщик для распределения адрисов по циклу отправки
 //TODO: написать сортировщик для распределения адрисов по циклу увиличения таймера
 
+#define NUMBER_OF_ADRESS 30
+
 #define ad0x18FFA0F3 0
 #define ad0x18FFA1F3 1
 #define ad0x18FFA2F3 2
@@ -63,7 +65,19 @@
 #define BIT_6 6 
 #define BIT_7 6 
 
+#define CYC_TIMES 9
 
+int cycles_arr[CYC_TIMES] = {
+    0,
+    10,
+    20,
+    50,
+    100,
+    250,
+    500,
+    1000,
+    3000
+};
 
 
 typedef struct {
@@ -77,8 +91,10 @@ typedef struct {
 
 typedef struct {
     uint32_t adress;
+    uint8_t message[8];
+}ad_to_gen_t;
 
-};
+ad_to_gen_t ad_to_gen[NUMBER_OF_ADRESS];
 
 typedef struct {
     uint8_t byte;
@@ -112,6 +128,53 @@ int printAdress(std::vector<adress_t> a, uint32_t adr) {
     }
     return 0;
 }
+
+/**
+ * @brief Печатает массив в адекватнм виде для 
+ * использования его в проекте stm
+ * @param a ссылка на вектор со всеми адресами
+ * @return возвращает 0 при выполнении функции, при ошибках 1.
+ */
+int printArraysForStm(
+    const std::vector<adress_t> a) {
+
+    std::cout << "--------------------- ARRAYS FOR STM ---------------------" << std::endl;
+
+    for (int i = 0; i < a.size(); i++) {
+        std::cout << "static uint8_t data0x" << std::hex << std::setfill('0') << std::setw(8) << a[i].adress;
+        std::cout << "[8] = {";
+        for (int j = 0; j < 8; j++) {
+            std::cout << "0x" << std::hex << std::setfill('0') << std::setw(2) << static_cast<int>(a[i].message[j]) << ", ";
+        }
+        std::cout << "};";
+        std::cout << "//cycle: " << std::dec << a[i].cycle << ", " << a[i].comment;
+        std::cout << std::endl;
+    }
+    std::cout << std::endl;
+    return 0;
+}
+
+
+int printArraysByCycle(
+    const std::vector<adress_t> a) {
+
+    std::cout << "--------------------- SORT ADRESS BY CYCLES TIME ---------------------" << std::endl;
+    
+    for (int i = 0; i < CYC_TIMES; i++) {
+        std::cout << "cycle: " << std::dec << cycles_arr[i] << std::endl;
+        for (int j = 0; j < a.size(); j++) {
+            if (a[j].cycle == cycles_arr[i]) {
+                std::cout << "0x" << std::hex << std::setfill('0') << std::setw(8) << a[j].adress << std::endl;
+            }
+        }
+        std::cout << std::endl;
+    }
+
+    
+    std::cout << std::endl;
+    return 0;
+}
+
 /**
  * @brief Печатает сообщение в бинарном виде.
  * @param a ссылка на вектор со всеми адресами
@@ -973,7 +1036,7 @@ int main()
     setTwoByte(m, 0x18FFA8F3, bitToByte(32).byte, (uint32_t)(positive_insulation_resistance));
 
     //биты 48-63 байты 6-7
-    //Положительное сопротивление изоляции RGND_POS в кОм
+    //Отрицательное сопротивление изоляции RGND_POS в кОм
     const float negative_insulation_resistance = 50000.0;//из логов
     setTwoByte(m, 0x18FFA8F3, bitToByte(48).byte, (uint32_t)(negative_insulation_resistance));
 
@@ -1053,12 +1116,12 @@ int main()
 
 
 
-    printMessageHex(m, 0x18FFA9F3);
-    
+    //printMessageHex(m, 0x18FFA9F3);
+    //printAllData(m);
 
+    printArraysForStm(m);
 
-    
-    printAllData(m);
+    printArraysByCycle(m);
 
 
 }
