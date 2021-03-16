@@ -313,7 +313,6 @@ int set12Bits(
  * @param byte_value значение устанавливаемого значенния
  * @return возвращает 0 при выполнении функции, при ошибках 1.
  */
-
 int setBit(
     std::vector<adress_t>& a, uint32_t adr, uint32_t bit_pos, uint32_t byte_pos) {
 
@@ -753,7 +752,7 @@ int main()
 
     float motor_AC = 0.6;// переменный ток двигателя
     motor_AC /= 0.1;
-    setTwoByte(m, 0x18FFA0F3, 3, (uint32_t)(motor_AC));
+    setTwoByte(m, 0x18FFA0F3, bitToByte(24).byte, (uint32_t)(motor_AC));
 
     //printMessageHex(m, 0x18FFA0F3);
     //printMessageBin(m, 0x18FFA0F3);
@@ -1167,9 +1166,40 @@ int main()
     /*---------------------------------------------------------0x1810A6A0-------------------------------------*/
 
     setCycle(m, 0x1810A6A0, 50);
-    setComment(m, 0x1810A6A0, "");
+    setComment(m, 0x1810A6A0, "аккумулятор, ток батареи, Напряжение батареи, сопротивление изоляции, максимальная температура ячейки, Индикаторы");
 
+    //биты 0-7
+    // аккумулятор SOC Batt_SOC_INS
+    const uint32_t Batt_SOC_INS = 96; //из логов
+    setByte(m, 0x1810A6A0, bitToByte(0).byte, Batt_SOC_INS);
 
+    //биты 8-23
+    //ток батареи Batt_Current_INS
+    const float Batt_Current_INS1 = 82; //из логов
+    setByte(m, 0x1810A6A0, bitToByte(8).byte, (uint32_t)((Batt_Current_INS1 - 400) / 0.1));
+
+    const float Batt_Current_INS2 = 15; //из логов
+    setByte(m, 0x1810A6A0, bitToByte(16).byte, (uint32_t)((Batt_Current_INS2 - 400) / 0.1));
+
+    //биты 24-39
+    //Напряжение батареи Batt_Volt_INS
+    const uint32_t Batt_Volt_INS1 = 10; //из логов
+    setByte(m, 0x1810A6A0, bitToByte(24).byte, Batt_Volt_INS1);
+
+    const uint32_t Batt_Volt_INS2 = 21; //из логов
+    setByte(m, 0x1810A6A0, bitToByte(32).byte, Batt_Volt_INS2);
+
+    //биты 40-47
+    //сопротивление изоляции Insul_Resistance
+    const uint32_t Insul_Resistance = 0; //из логов
+    setByte(m, 0x1810A6A0, bitToByte(40).byte, Insul_Resistance);
+
+    //биты 48-55
+    //максимальная температура Cell_Max_Temp
+     const uint32_t Batt_Volt_INS2 = 21; //из логов
+    //setByte(m, 0x1810A6A0, bitToByte(48).byte, Cell_Max_Temp);
+
+    //Insul_Resistance
     /*---------------------------------------------------------0x1820F8F4-------------------------------------*/
 
     setCycle(m, 0x1820F8F4, 1000);
