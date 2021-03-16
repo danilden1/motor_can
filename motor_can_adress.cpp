@@ -67,7 +67,7 @@
 
 typedef struct {
     uint32_t adress;
-    uint8_t message[8];
+    uint32_t message[8];
     uint32_t cycle; // время повторения посылки
     uint32_t time_cycle; // время обновления таймера, если 0, то аймера нет
     uint32_t timer_pos; //позиция первого бита в таймере. предполагается, что таймеры 4х битные.
@@ -391,6 +391,7 @@ int setTwoByte(
     
     if (byte_pos > 6 || byte_value > 0xFFFF){
         std::cout << "!!!error setTwoByte by input value on adr " << adr;
+        return 1;
     }
 
     for (int i = 0; i < a.size(); i++) {
@@ -421,6 +422,7 @@ int setTwoByteNoChange(
 
     if (byte_pos > 6 || byte_value > 0xFFFF) {
         std::cout << "!!!error setTwoByteNoChange by input value on adr " << adr;
+        return 1;
     }
 
     for (int i = 0; i < a.size(); i++) {
