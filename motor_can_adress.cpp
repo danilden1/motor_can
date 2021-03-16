@@ -67,7 +67,7 @@
 
 typedef struct {
     uint32_t adress;
-    uint32_t message[8];
+    uint8_t message[8];
     uint32_t cycle; // время повторения посылки
     uint32_t time_cycle; // время обновления таймера, если 0, то аймера нет
     uint32_t timer_pos; //позиция первого бита в таймере. предполагается, что таймеры 4х битные.
@@ -433,8 +433,17 @@ int setTwoByteNoChange(
     std::cout << "!!!error set bit on adr " << adr;
     return 1;
 }
-
-int setCycle(std::vector<adress_t>& a, uint32_t adr, uint32_t cyc) {
+/**
+ * @brief устанавливает время цикла отправки сообщения в мс
+ * @param a ссылка на вектор со всеми адресами
+ * @param adr адрес интересующего нас сообщения
+ * @param cyc время в мс
+ * @return возвращает 0 при выполнении функции, при ошибках 1.
+ */
+int setCycle(
+    std::vector<adress_t>& a, 
+    const uint32_t adr, 
+    const uint32_t cyc) {
 
     for (int i = 0; i < a.size(); i++) {
         if (a[i].adress == adr) {
@@ -445,8 +454,18 @@ int setCycle(std::vector<adress_t>& a, uint32_t adr, uint32_t cyc) {
     std::cout << "!!!error set cyc on adr " << adr;
     return 1;
 }
-
-int setTimeCycle(std::vector<adress_t>& a, uint32_t adr, uint32_t time_cycle) {
+/**
+ * @brief устанавливает время цикла обновления счетчика в мс.
+ * при отсутствии счетчика оставить 0
+ * @param a ссылка на вектор со всеми адресами
+ * @param adr адрес интересующего нас сообщения
+ * @param time_cycle время в мс
+ * @return возвращает 0 при выполнении функции, при ошибках 1.
+ */
+int setTimeCycle(
+    std::vector<adress_t>& a, 
+    const uint32_t adr, 
+    const uint32_t time_cycle) {
 
     for (int i = 0; i < a.size(); i++) {
         if (a[i].adress == adr) {
@@ -458,7 +477,18 @@ int setTimeCycle(std::vector<adress_t>& a, uint32_t adr, uint32_t time_cycle) {
     return 1;
 }
 
-int setComment(std::vector<adress_t>& a, uint32_t adr, std::string comment) {
+
+/**
+ * @brief устанавливает комментарий к адресу
+ * @param a ссылка на вектор со всеми адресами
+ * @param adr адрес интересующего нас сообщения
+ * @param time_cycle время в мс
+ * @return возвращает 0 при выполнении функции, при ошибках 1.
+ */
+int setComment(
+    std::vector<adress_t>& a, 
+    const uint32_t adr, 
+    const std::string comment) {
 
     for (int i = 0; i < a.size(); i++) {
         if (a[i].adress == adr) {
@@ -470,7 +500,17 @@ int setComment(std::vector<adress_t>& a, uint32_t adr, std::string comment) {
     return 1;
 }
 
-int setTimerPos(std::vector<adress_t>& a, uint32_t adr, uint32_t pos) {
+/**
+ * @brief устанавливает позицию младщего бита таймера
+ * @param a ссылка на вектор со всеми адресами
+ * @param adr адрес интересующего нас сообщения
+ * @param pos позиция
+ * @return возвращает 0 при выполнении функции, при ошибках 1.
+ */
+int setTimerPos(
+    std::vector<adress_t>& a, 
+    const uint32_t adr, 
+    const uint32_t pos) {
 
     for (int i = 0; i < a.size(); i++) {
         if (a[i].adress == adr) {
@@ -482,13 +522,22 @@ int setTimerPos(std::vector<adress_t>& a, uint32_t adr, uint32_t pos) {
     return 1;
 }
 
+
+/**
+ * @brief устанавливает пару из 12 битных значения
+ * @param a ссылка на вектор со всеми адресами
+ * @param adr адрес интересующего нас сообщения
+ * @param byte_pos первого байта в паре сообщений (0 - 5)
+ * @param byte_value_1 значение первого 12 битного поля из пары
+ * @param byte_value_2 значение второго 12 битного поля из пары
+ * @return возвращает 0 при выполнении функции, при ошибках 1.
+ */
 int setPairOf12Bit(
     std::vector<adress_t>& a, 
     const uint32_t adr, 
     const uint32_t byte_pos, 
     const uint32_t byte_value_1, 
-    const uint32_t byte_value_2
-) {
+    const uint32_t byte_value_2) {
 
     if (byte_value_1 > 0xFFF || byte_value_2 > 0xFFF || byte_pos > 5) {
         std::cout << "!!!error setPairOf12Bit by input value on adr " << adr;
@@ -511,6 +560,12 @@ int setPairOf12Bit(
     return 1;
 }
 
+
+/**
+ * @brief печатает одно сообшение по указанному адресу
+ * я не использую эту функцию. уже не помню что она делает
+ * @param a ссылка на вектор со всеми адресами
+ */
 void printMessage(adress_t a) {
     std::cout << "0x" << std::hex << std::setfill('0') << std::setw(8) << a.adress << " | ";
     for (int i = 0; i < 7; i++) {
@@ -523,6 +578,10 @@ void printMessage(adress_t a) {
     std::cout << a.comment;
 }
 
+/**
+ * @brief печатает полностью весь вектор адресов со всеми полями
+ * @param adr адрес интересующего нас сообщения
+ */
 void printAllData(std::vector<adress_t> a) {
     std::cout << "adress |                         message                         |time_cycle|cycle|timer_pos|comment" << std::endl;
     for (int i = 0; i < a.size(); i++) {
@@ -531,7 +590,13 @@ void printAllData(std::vector<adress_t> a) {
     }
 }
 
-//переводит значение бит в пару из значений байт(0-7) и бит(0-7)
+/**
+ * @brief переводит бит (0-63) в пару байт (0-7) и бит(0-7)
+ * 43  -> (5, 3). Нужно для использование битового адреса в байтовыз функциях
+ * bitToByte(43).byte = 5
+ * bitToByte(43).bit = 3
+ * @param a ссылка на вектор со всеми адресами
+ */
 pair_bits_t  bitToByte(const uint32_t input_bit) {
     pair_bits_t ret;
     ret.byte = input_bit / 8;
