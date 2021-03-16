@@ -143,9 +143,10 @@ int printArraysForStm(
     for (int i = 0; i < a.size(); i++) {
         std::cout << "static uint8_t data0x" << std::hex << std::setfill('0') << std::setw(8) << a[i].adress;
         std::cout << "[8] = {";
-        for (int j = 0; j < 8; j++) {
+        for (int j = 0; j < 7; j++) {
             std::cout << "0x" << std::hex << std::setfill('0') << std::setw(2) << static_cast<int>(a[i].message[j]) << ", ";
         }
+        std::cout << "0x" << std::hex << std::setfill('0') << std::setw(2) << static_cast<int>(a[i].message[7]);
         std::cout << "};";
         std::cout << "//cycle: " << std::dec << a[i].cycle << ", " << a[i].comment;
         std::cout << std::endl;
@@ -165,6 +166,7 @@ int printArraysByCycle(
         for (int j = 0; j < a.size(); j++) {
             if (a[j].cycle == cycles_arr[i]) {
                 std::cout << "#define ____0x" << std::hex << std::setfill('0') << std::setw(8) << a[j].adress << std::endl;
+                std::cout << "//" << a[j].comment << std::endl;
                 std::cout << "      msg.Id = 0x" << std::hex << std::setfill('0') << std::setw(8) << a[j].adress << ";" << std::endl;
                 std::cout << "      msg.bStdId = 0;" << std::endl;
                 std::cout << "      msg.Dlc = 8;" << std::endl;
@@ -748,12 +750,12 @@ int main()
     setBit(m, 0x18FFA0F3, 2, 0); // нуливой байт второй бит включение чего-то
 
     //биты 8-23 напряжение, то есть первый байт и второй байты.
-    float input_vlotage_MCU = 316.9;
-    input_vlotage_MCU += 15.5; //суммируем напряжение от ЛБИ и от разетки
-    input_vlotage_MCU /= 0.1; //масштабируем напряжение
-    uint32_t voltage_hex = (uint32_t)(input_vlotage_MCU);
+    const float input_vlotage_MCU = 316.9;
+    const float input_low_vlotage_MCU = 15.5; //суммируем напряжение от ЛБП и от разетки
+    //input_vlotage_MCU /= 0.1; //масштабируем напряжение
+    const uint64_t voltage_hex = (uint64_t)((input_vlotage_MCU + input_low_vlotage_MCU) / 0.1);
 
-    setTwoByte(m, 0x18FFA0F3, 1, voltage_hex);
+    setTwoByte(m, 0x18FFA0F3, 1, (uint64_t)((input_vlotage_MCU + input_low_vlotage_MCU) / 0.1));
     
     //биты 24-40 переменный ток двигателя, то есть третий и четвертый байты
 
@@ -1182,88 +1184,179 @@ int main()
 
     //биты 8-23
     //ток батареи Batt_Current_INS
-    const float Batt_Current_INS1 = 82; //из логов
-    setByte(m, 0x1810A6A0, bitToByte(8).byte, (uint32_t)((Batt_Current_INS1 - 400) / 0.1));
-
-    const float Batt_Current_INS2 = 15; //из логов
-    setByte(m, 0x1810A6A0, bitToByte(16).byte, (uint32_t)((Batt_Current_INS2 - 400) / 0.1));
+    const float Batt_Current_INS = 3922; //из логов
+    setTwoByte(m, 0x1810A6A0, bitToByte(8).byte, (uint32_t)((Batt_Current_INS - 400) / 0.1));
 
     //биты 24-39
     //Напряжение батареи Batt_Volt_INS
-    const uint32_t Batt_Volt_INS1 = 10; //из логов
-    setByte(m, 0x1810A6A0, bitToByte(24).byte, Batt_Volt_INS1);
-
-    const uint32_t Batt_Volt_INS2 = 21; //из логов
-    setByte(m, 0x1810A6A0, bitToByte(32).byte, Batt_Volt_INS2);
+    const float Batt_Volt_INS = 5386; //из логов
+    setTwoByte(m, 0x1810A6A0, bitToByte(24).byte, (uint32_t)((Batt_Volt_INS) / 0.1));
 
     //биты 40-47
     //сопротивление изоляции Insul_Resistance
-    const uint32_t Insul_Resistance = 0; //из логов
-    setByte(m, 0x1810A6A0, bitToByte(40).byte, Insul_Resistance);
+    const float Insul_Resistance = 0; //из логов
+    setByte(m, 0x1810A6A0, bitToByte(40).byte, (uint32_t)((Insul_Resistance) / 0.1));
 
     //биты 48-55
     //максимальная температура Cell_Max_Temp
-     //const uint32_t Batt_Volt_INS2 = 21; //из логов
-    //setByte(m, 0x1810A6A0, bitToByte(48).byte, Cell_Max_Temp);
+    const float Cell_Max_Temp = 71; //из логов
+    setByte(m, 0x1810A6A0, bitToByte(48).byte, (uint32_t)((Cell_Max_Temp - 50)));
 
-    //Insul_Resistance
+    //биты 56-63
+    //leds
+    const uint32_t leds = 66; //из логов
+    setByte(m, 0x1810A6A0, bitToByte(56).byte, Cell_Max_Temp);
+
+
     /*---------------------------------------------------------0x1820F8F4-------------------------------------*/
 
     setCycle(m, 0x1820F8F4, 1000);
-    setComment(m, 0x1820F8F4, "дичь с временем отправки");
+    setComment(m, 0x1820F8F4, "!!!не отправляется!!!");
+
+
 
     /*---------------------------------------------------------0x1880F8F4-------------------------------------*/
 
     setCycle(m, 0x1880F8F4, 1000);
-    setComment(m, 0x1880F8F4, "дичь с временем отправки");
+    setComment(m, 0x1880F8F4, "!!!не отправляется!!!");
 
     /*---------------------------------------------------------0x08F000A0-------------------------------------*/
 
     setCycle(m, 0x08F000A0, 50);
-    setComment(m, 0x08F000A0, "");
+    setComment(m, 0x08F000A0, "дата");
+    setTimeCycle(m, 0x08F000A0, 50);
+    setTimerPos(m, 0x08F000A0, 53);
 
+    //биты 0-7
+    //год
+    const uint32_t year = 2021;
+    setByte(m, 0x08F000A0, bitToByte(0).byte, year);
+
+    //биты 16-23
+    //месяц
+    const uint32_t month = 3;
+    setByte(m, 0x08F000A0, bitToByte(15).byte, month);
+
+
+    //биты 8-15
+    //месяц
+    const uint32_t day = 3;
+    setByte(m, 0x08F000A0, bitToByte(0).byte, day);
+
+    //байты 3-4 версия ПО
+    setTwoByte(m, 0x08F000A0, 3, 0x0205);//из логов
+
+    //байт 5 
+    //Аппаратный код VCU
+    setByte(m, 0x08F000A0, 5, 0xAC);//из логов
+
+    //байт 6 
+    //Аппаратный код VCU
+    setByte(m, 0x08F000A0, 6, 0x14);//из логов
 
     /*---------------------------------------------------------0x041000A0-------------------------------------*/
 
     setCycle(m, 0x041000A0, 50);
     setComment(m, 0x041000A0, "");
 
+    setByte(m, 0x041000A0, 0, 0x00);//ошибки
+    setByte(m, 0x041000A0, 1, 0x00);//ошибки
+    setByte(m, 0x041000A0, 2, 0x00);//ошибки
+
+    setTwoByte(m, 0x041000A0, 3, voltage_hex); //Паша сказал что тут сумма напряжений
+
+    setByte(m, 0x041000A0, 5, 0x00);//ошибки
+    setByte(m, 0x041000A0, 6, 0x00);//ошибки
+    setByte(m, 0x041000A0, 7, 0x00);//ошибки
 
     /*---------------------------------------------------------0x0C20A0A6-------------------------------------*/
 
     setCycle(m, 0x0C20A0A6, 50);
     setComment(m, 0x0C20A0A6, "рама");
+    setTimeCycle(m, 0x0C20A0A6, 50);
+    setTimerPos(m, 0x0C20A0A6, 0);
 
+    setByte(m, 0x0C20A0A6, 1, 0x00);//ошибки
+
+    setByte(m, 0x0C20A0A6, 2, 0x2b);//из логов пробег
+    setByte(m, 0x0C20A0A6, 3, 0x00);//из логов пробег
+    setByte(m, 0x0C20A0A6, 4, 0x00);//из логов пробег
+
+    // байты 5-6 
+    //давление в воздушном резервуаре 0.01 МПа
+    setByte(m, 0x0C20A0A6, 5, 0xf0);//из логов
+    setByte(m, 0x0C20A0A6, 6, 0xf0);//из логов
+
+    setByte(m, 0x0C20A0A6, 7, 0x00);//ошибки
 
     /*---------------------------------------------------------0x0CFF08EF-------------------------------------*/
 
+    
     setCycle(m, 0x0CFF08EF, 10);
-    setComment(m, 0x0CFF08EF, "пределы скоростей, крутящий момент, передача, ");
+    setComment(m, 0x0CFF08EF, "сделано у дмитрия");
+
 
 
     /*---------------------------------------------------------0x0CFF0008-------------------------------------*/
 
     setCycle(m, 0x0CFF0008, 10);
-    setComment(m, 0x0CFF0008, "скоросто мотора, крутящий момент двигателя");
+    setComment(m, 0x0CFF0008, "!!!не отправляем!!!скоросто мотора, крутящий момент двигателя, счетчик 4 бита 0-15");
+    setTimeCycle(m, 0x0CFF0008, 10);
+    setTimerPos(m, 0x0CFF0008, 4);
+    
+    setBit(m, 0x0CFF0008, 0, 1);// enable MCU
+    setBit(m, 0x0CFF0008, 1, 0);// ошибки
+    set2Bites(m, 0x0CFF0008, 2, 3); //Active discharge
+    //setPairOf12Bit(m, 0x0CFF0008, bitToByte(8).byte, 16384, 0);
+
+    setByte(m, 0x0CFF0008, 1, 0xd6);//из логов
+    setByte(m, 0x0CFF0008, 2, 0x06);//из логов
+    setByte(m, 0x0CFF0008, 3, 0x19);//из логов
+
+    //момент
+    setTwoByte(m, 0x0CFF0008, 4, (uint32_t)(1000 + 5000));//1000 Нм
+
+    setByte(m, 0x0CFF0008, 6, 0x01);//включить переключение передач
+
+    setByte(m, 0x0CFF0008, 6, 0x0d);//верим Максиму
 
 
     /*---------------------------------------------------------0x0CFF0108-------------------------------------*/
 
     setCycle(m, 0x0CFF0108, 20);
     setComment(m, 0x0CFF0108, "температура корпуса и контроллера, пределы крутящего момента, неисправности шестерен, переключение скоростей");
+    setTimeCycle(m, 0x0CFF0108, 20);
+    setTimerPos(m, 0x0CFF0108, 59);
+    setByte(m, 0x0CFF0108, 0, (uint32_t)0x40);//температура мотора
+    setByte(m, 0x0CFF0108, 1, (uint32_t)0x40);//температура mcu
+
+    setByte(m, 0x0CFF0108, 2, (uint32_t)0x00);// из логов
+    setByte(m, 0x0CFF0108, 3, (uint32_t)0x00);// из логов
+    setByte(m, 0x0CFF0108, 4, (uint32_t)0x88);// из логов
+    setByte(m, 0x0CFF0108, 5, (uint32_t)0x13);// из логов
+
+    setLower4Bites(m, 0x0CFF0108, 5, (uint32_t)0);// ошибки
+    setUpper4Bites(m, 0x0CFF0108, 5, (uint32_t)(1));// перавя передача
+
 
 
 
     /*---------------------------------------------------------0x0CFF0208-------------------------------------*/
 
     setCycle(m, 0x0CFF0208, 20);
-    setComment(m, 0x0CFF0208, "ошибки, ток, напряжение, обороты");
+    setComment(m, 0x0CFF0208, "ошибки, ток, напряжение, 2 таймера на 47 0-255 и на 59 0-15");
+
+    setTwoByte(m, 0x0CFF0208, 0, 0); // ошибки
+    setTwoByte(m, 0x0CFF0208, 2, (uint32_t)(battary_current + 1000));//ток мотора
+    setTwoByte(m, 0x0CFF0208, 2, (uint32_t)(output_voltage / 0.1));//напряжение мотора
+    
 
 
     /*---------------------------------------------------------0x0CFF0308-------------------------------------*/
 
     setCycle(m, 0x0CFF0308, 50);
-    setComment(m, 0x0CFF0308, "предупреждения и ошибки");
+    setComment(m, 0x0CFF0308, "предупреждения и ошибки все нули");
+
 
 
     /*---------------------------------------------------------0x0CFF0408-------------------------------------*/
@@ -1271,19 +1364,70 @@ int main()
     setCycle(m, 0x0CFF0408, 100);
     setComment(m, 0x0CFF0408, "производитель");
 
+    setByte(m, 0x0CFF0408, 0, 0x01); // из логов
+    setTwoByte(m, 0x0CFF0408, 1, 0x0000); // из лгогв
+    setTwoByte(m, 0x0CFF0408, 3, 0x013b); // из лгогв
+    setByte(m, 0x0CFF0408, 5, 0x00); // из логов
+    setByte(m, 0x0CFF0408, 6, 0x00); // из логов
+    setByte(m, 0x0CFF0408, 7, 0x00); // из логов
 
     /*---------------------------------------------------------0x0CFF0508-------------------------------------*/
 
     setCycle(m, 0x0CFF0508, 500);
     setComment(m, 0x0CFF0508, "серийные номера, пратия, год");
 
-    /*---------------------------------------------------------0x1811A6A0-------------------------------------*/
+    setTwoByte(m, 0x0CFF0408, 0, 0x0001); // из лгогв номер партии контроллера
+    setByte(m, 0x0CFF0408, 2, 0x01); // из логов
+    setByte(m, 0x0CFF0408, 2, 0x00); // из логов
+    setByte(m, 0x0CFF0408, 3, 0x14); // из логов
+    setByte(m, 0x0CFF0408, 4, 0x03); // из логов
+    setByte(m, 0x0CFF0408, 5, 0x0f); // из логов
+    setByte(m, 0x0CFF0408, 5, 0x0f); // из логов
 
-    setCycle(m, 0x1811A6A0, 500);
-    setComment(m, 0x1811A6A0, "ошибки, скорость, пробег");
 
 
-    
+    //--/*---------------------------------------------------------0x1811A6A0-------------------------------------*/
+
+    uint32_t mem = 0x1811A6A0;
+    setCycle(m, mem, 50);
+    setComment(m, mem, "LEDs1, LEDs2, Veh_Limit_Speed, Remaining_Mil, AV_EleCconsume, Ins_EleCconsume, Reserved");
+
+    //биты 0-7
+    //LEDs1
+    const uint32_t LEDs1 = 00; //из логов
+    setByte(m, mem, bitToByte(0).byte, LEDs1);
+
+    //биты 8-15
+    //LEDs2
+    const uint32_t LEDs2 = 2; //из логов
+    setByte(m, mem, bitToByte(8).byte, LEDs2);
+
+    //биты 16-23
+    //Veh_Limit_Speed
+    const uint32_t Veh_Limit_Speed = 90; //из логов
+    setByte(m, mem, bitToByte(16).byte, Veh_Limit_Speed);
+
+    //биты 24-31
+    //Veh_Limit_Speed
+    const uint32_t Remaining_Mil = 00; //из логов
+    setByte(m, mem, bitToByte(24).byte, Remaining_Mil);
+
+    //биты 32-39
+    //Veh_Limit_Speed
+    const uint32_t AV_EleCconsume = 00; //из логов
+    setByte(m, mem, bitToByte(32).byte, AV_EleCconsume);
+
+    //биты 40-47
+    //Veh_Limit_Speed
+    const uint32_t Ins_EleCconsume = 250; //из логов
+    setByte(m, mem, bitToByte(40).byte, Ins_EleCconsume);
+
+    //биты 48-63
+    //Напряжение батареи Batt_Volt_INS
+    const uint32_t Reserved = 0; //из логов
+    setTwoByte(m, mem, bitToByte(48).byte, ((Reserved)));
+
+
     /*---------------------------------------------------------0x18ffaff3-------------------------------------*/
 
     setCycle(m, 0x18ffaff3, 1000);
@@ -1292,17 +1436,58 @@ int main()
     /*---------------------------------------------------------0x18fecaf3-------------------------------------*/
 
     setCycle(m, 0x18fecaf3, 100);
-    setComment(m, 0x18fecaf3, "Диагностическое сообщение BCU");
+    setComment(m, 0x18fecaf3, "Диагностическое сообщение BCU все нули");
 
     /*---------------------------------------------------------0x08f200a0-------------------------------------*/
 
-    setCycle(m, 0x08f200a0, 50);
-    setComment(m, 0x08f200a0, "Кадр состояния транспортного");
+    mem = 0x08F200A0;
+    setCycle(m, mem, 50);
+    setComment(m, mem, "Состояние транспортного средства");
 
+    //биты 0-7
+    //Vehicle_Mode
+    const uint32_t Vehicle_Mode = 1; //из логов
+    setByte(m, mem, bitToByte(0).byte, Vehicle_Mode);
 
+    //биты 8-15
+    //Shift_and_Key_Status
+    const uint32_t Shift_and_Key_Status = 42; //из логов
+    setByte(m, mem, bitToByte(8).byte, Shift_and_Key_Status);
+
+    //биты 16-23
+    //Charging_or_Driving_Mode
+    const uint32_t Charging_or_Driving_Mode = 00; //из логов
+    setByte(m, mem, bitToByte(16).byte, Charging_or_Driving_Mode);
+
+    //биты 24-31
+    //Reserved1
+    const uint32_t Reserved1 = 00; //из логов
+    setByte(m, mem, bitToByte(24).byte, Reserved1);
+
+    //биты 32-39
+    //Reserved2
+    const uint32_t Reserved2 = 00; //из логов
+    setByte(m, mem, bitToByte(32).byte, Reserved2);
+
+    //биты 40-47
+    //Vehicle_Speed
+    const uint32_t Vehicle_Speed = 0; //из логов
+    setByte(m, mem, bitToByte(40).byte, Vehicle_Speed);
+
+    //биты 48-63
+    //Pedal_State
+    const uint32_t Pedal_State = 42; //из логов
+    setByte(m, mem, bitToByte(48).byte, Pedal_State);
+
+    //биты 40-47
+    //Brake_State
+    const uint32_t Brake_State = 0; //из логов
+    setByte(m, mem, bitToByte(56).byte, Brake_State);
 
 
     printArraysForStm(m);
+
+    printAllData(m);
 
     printArraysByCycle(m);
 
