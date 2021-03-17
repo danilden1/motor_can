@@ -794,7 +794,7 @@ int main()
     //8 = штекерный пистолет постоянного тока не заряжен
     //9 = вилка переменного тока не заряжена
     //10 ~15 = зарезервирован
-    setUpper4Bites(m, 0x18FFA1F3, BYTE_0, 3);
+    setUpper4Bites(m, 0x18FFA1F3, BYTE_0, 0);
    
 
     //биты 8-11 нижние биты первого байта ошибки BMS
@@ -1057,15 +1057,15 @@ int main()
     //положительная и отрецательная температура гнезда быстрой зарядки
     const float positive_fast_charge_socket_temperature = 15; //из логов
     const float negative_fast_charge_socket_temperature = 15; //из логов
-    setByte(m, 0x18FFAEF3, bitToByte(0).byte, (uint32_t)(positive_fast_charge_socket_temperature));
-    setByte(m, 0x18FFAEF3, bitToByte(8).byte, (uint32_t)(negative_fast_charge_socket_temperature));
+    setByte(m, 0x18FFAEF3, bitToByte(0).byte, (uint32_t)(positive_fast_charge_socket_temperature + 50));
+    setByte(m, 0x18FFAEF3, bitToByte(8).byte, (uint32_t)(negative_fast_charge_socket_temperature + 50));
 
     //биты 16-23 и 24-31 
     //положительная и отрецательная температура гнезда медленной зарядки
     const float positive_slow_charge_socket_temperature = 15; //из логов
     const float negative_slow_charge_socket_temperature = 15; //из логов
-    setByte(m, 0x18FFAEF3, bitToByte(0).byte, (uint32_t)(positive_slow_charge_socket_temperature));
-    setByte(m, 0x18FFAEF3, bitToByte(8).byte, (uint32_t)(negative_slow_charge_socket_temperature));
+    setByte(m, 0x18FFAEF3, bitToByte(16).byte, (uint32_t)(positive_slow_charge_socket_temperature + 50));
+    setByte(m, 0x18FFAEF3, bitToByte(24).byte, (uint32_t)(negative_slow_charge_socket_temperature + 50));
 
     //биты 32-39 40-47 48-55 56-63 
     //зарезервировано, все нули
@@ -1271,9 +1271,9 @@ int main()
 
     /*---------------------------------------------------------0x0C20A0A6-------------------------------------*/
 
-    setCycle(m, 0x0C20A0A6, 50);
+    setCycle(m, 0x0C20A0A6, 10);
     setComment(m, 0x0C20A0A6, "рама");
-    setTimeCycle(m, 0x0C20A0A6, 50);
+    setTimeCycle(m, 0x0C20A0A6, 10);
     setTimerPos(m, 0x0C20A0A6, 0);
 
     setByte(m, 0x0C20A0A6, 1, 0x00);//ошибки
@@ -1487,9 +1487,9 @@ int main()
 
     printArraysForStm(m);
 
-    printAllData(m);
+    //printAllData(m);
 
-    printArraysByCycle(m);
+    //printArraysByCycle(m);
 
 
 }
